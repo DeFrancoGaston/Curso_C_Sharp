@@ -2,6 +2,7 @@
 {
     using Microsoft.Data.SqlClient;
     using SistemaGestionEntities;
+    using SistemaGestionEntities.Responses;
 
     public static class UsuarioData
     {
@@ -11,10 +12,9 @@
         // Método para insertar un nuevo usuario en la Base de Datos
         // Recibe un objeto Usuario con la información del usuario a crear
         // Devuelve el Id asignado al nuevo registro
-        public static long CrearUsuario(Usuario usuario)
+        public static UsuarioResponse CrearUsuario(Usuario usuario)
         {
-            long respuesta;
-
+            UsuarioResponse usuarioResponse = new UsuarioResponse();
             try
             {
                 // Creamos una nueva conexión a la base de datos utilizando el string de conexión que se recibió en el constructor
@@ -22,6 +22,7 @@
                 {
                     // Abrimos la conexión
                     connection.Open();
+                    long respuesta;
 
                     // Definimos la consulta SQL que vamos a ejecutar
                     const string query = @"INSERT INTO Usuario (Nombre, Apellido, NombreUsuario, Contraseña, Mail) 
@@ -41,24 +42,24 @@
                         respuesta = (long)(command.ExecuteScalar());
                     }
                     connection.Close();
-                    return respuesta;
+                    usuarioResponse.Mensaje = "OK";
+                    usuarioResponse.Id = respuesta;
                 }
+                return usuarioResponse;
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return -1;
-                throw;
-
+                usuarioResponse.Mensaje = ex.Message;
+                return usuarioResponse;
             }
         }
 
         // Método para eliminar un usuario de la Base de Datos según su Id
         // Recibe el Id del usuario que se desea eliminar
         // Devuelve true si la eliminación fue exitosa, false si no
-        public static bool EliminarUsuario(long id)
+        public static UsuarioResponse EliminarUsuario(long id)
         {
-            bool respuesta;
+            UsuarioResponse usuarioResponse = new UsuarioResponse();
 
             try
             {
@@ -76,26 +77,32 @@
 
                         // Ejecutamos la consulta SQL utilizando ExecuteNonQuery() que retorna la cantidad de filas afectadas por la consulta SQL
                         // En este caso, debería ser 1 si se eliminó el usuario correctamente, o 0 si no se encontró el usuario con el Id correspondiente
-                        respuesta = command.ExecuteNonQuery() > 0;
+                        if (command.ExecuteNonQuery() > 0)
+                        {
+                            usuarioResponse.Mensaje = "OK";
+                        }
+                        else
+                        {
+                            usuarioResponse.Mensaje = "ERROR";
+                        };
+                        connection.Close();
+                        return usuarioResponse;
                     }
-                    connection.Close();
-                    return respuesta;
                 }
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return false;
-                throw;
+                usuarioResponse.Mensaje = ex.Message;
+                return usuarioResponse;
             }
         }
 
         // Método para modificar un usuario existente en la Base de Datos
         // Recibe un objeto Usuario con la información actualizada del usuario a modificar
         // Devuelve true si la modificación fue exitosa, false si no
-        public static bool ModificarUsuario(Usuario usuario)
+        public static UsuarioResponse ModificarUsuario(Usuario usuario)
         {
-            bool respuesta;
+            UsuarioResponse usuarioResponse = new UsuarioResponse();
 
             try
             {
@@ -120,25 +127,32 @@
 
                         // Ejecutamos la consulta SQL utilizando ExecuteNonQuery() que retorna la cantidad de filas afectadas por la consulta SQL
                         // En este caso, debería ser 1 si se modificó el usuario correctamente, o 0 si no se encontró el usuario con el Id correspondiente
-                        respuesta = command.ExecuteNonQuery() > 0;
+                        if (command.ExecuteNonQuery() > 0)
+                        {
+                            usuarioResponse.Mensaje = "OK";
+                        }
+                        else
+                        {
+                            usuarioResponse.Mensaje = "ERROR";
+                        };
+                        connection.Close();
+                        return usuarioResponse;
                     }
-                    connection.Close();
-                    return respuesta;
                 }
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return false;
-                throw;
+                usuarioResponse.Mensaje = ex.Message;
+                return usuarioResponse;
             }
         }
 
         // Método para obtener la información de un usuario según su Id
         // Recibe el Id del usuario que se desea obtener
         // Devuelve un objeto Usuario con la información correspondiente, o null si no se encontró
-        public static Usuario ObtenerUsuario(long id)
+        public static UsuarioResponse ObtenerUsuario(long id)
         {
+            UsuarioResponse usuarioResponse = new UsuarioResponse();
             Usuario usuario = new Usuario();
 
             try
@@ -175,19 +189,21 @@
                         }
                     }
                     connection.Close();
-                    return usuario;
+                    usuarioResponse.Mensaje = "OK";
+                    usuarioResponse.Usuario = usuario;
                 }
+                return usuarioResponse;
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return null;
-                throw;
+                usuarioResponse.Mensaje = ex.Message;
+                return usuarioResponse;
             }
         }
         /*******************************************************************************************/
-        public static List<Usuario> ListarUsuarios()
+        public static UsuarioResponse ListarUsuarios()
         {
+            UsuarioResponse usuarioResponse = new UsuarioResponse();
             List<Usuario> lista = new List<Usuario>();
 
             try
@@ -225,15 +241,77 @@
                         }
                     }
                     connection.Close();
-                    return lista;
                 }
+                usuarioResponse.Mensaje = "OK";
+                usuarioResponse.Usuarios = lista;
+                return usuarioResponse;
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return null;
-                throw;
+                usuarioResponse.Mensaje = ex.Message;
+                return usuarioResponse;
             }
         }
+
+        // Método para obtener la información de un usuario según su nombre de usuario y su contraseña.
+        // Devuelve un objeto Usuario con la información correspondiente, o null si no se encontró
+        public static UsuarioResponse IniciarSesion(string nombreusr, string pass)
+        {
+            UsuarioResponse usuarioResponse = new UsuarioResponse();
+            Usuario usuario = new Usuario();
+
+            try
+            {
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    // Definimos la consulta SQL que vamos a ejecutar
+                    const string query = @"SELECT Id, Nombre, Apellido, NombreUsuario, Contraseña, Mail 
+                                             FROM Usuario
+                                            WHERE NombreUsuario = @NombreUsuario
+                                            And   Contraseña = @Contraseña";
+                    // Creamos una nueva instancia de SqlCommand con la consulta SQL y la conexión asociada
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        // Agregamos el parámetro correspondiente a la consulta SQL
+                        command.Parameters.AddWithValue("@NombreUsuario", nombreusr);
+                        command.Parameters.AddWithValue("@Contraseña", pass);
+
+                        // Ejecutamos la consulta SQL utilizando ExecuteReader() que retorna un objeto SqlDataReader que podemos utilizar para leer los datos devueltos por la consulta SQL
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.HasRows)
+                            {
+                                if (reader.Read())
+                                {
+                                    // Creamos un nuevo objeto Usuario con la información obtenida del objeto SqlDataReader
+                                    usuario.Id = reader.GetInt64(0);
+                                    usuario.Nombre = reader.GetString(1);
+                                    usuario.Apellido = reader.GetString(2);
+                                    usuario.NombreUsuario = reader.GetString(3);
+                                    usuario.Contraseña = reader.GetString(4);
+                                    usuario.Mail = reader.GetString(5);
+                                }
+                                usuarioResponse.Mensaje = "OK";
+                            }
+                            else
+                            {
+                                usuarioResponse.Mensaje = "Usuario o contraseña invalidos.";
+                            }
+                        }
+                    }
+                    connection.Close();
+                }
+                usuarioResponse.Usuario = usuario;
+                return usuarioResponse;
+            }
+            catch (Exception ex)
+            {
+                usuarioResponse.Mensaje = ex.Message;
+                return usuarioResponse;
+            }
+        }
+        /*******************************************************************************************/
     }
 }

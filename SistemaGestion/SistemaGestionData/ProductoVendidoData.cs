@@ -2,6 +2,7 @@
 {
     using Microsoft.Data.SqlClient;
     using SistemaGestionEntities;
+    using SistemaGestionEntities.Responses;
 
     public static class ProductoVendidoData
     {
@@ -9,9 +10,9 @@
         static string connectionString = "data source=DESKTOP-9M2BSDE\\MSSQLSERVER01;initial catalog=SistemaGestion;Trusted_Connection=True;TrustServerCertificate=true";
 
         // Método para insertar un nuevo ProductoVendido en la Base de Datos
-        public static long CrearProductoVendido(ProductoVendido productoVendido)
+        public static ProductoVendidoResponse CrearProductoVendido(ProductoVendido productoVendido)
         {
-            long respuesta;
+            ProductoVendidoResponse productoVendidoResponse = new ProductoVendidoResponse();
             try
             {
                 // Creamos una nueva conexión a la base de datos utilizando el string de conexión que se recibió en el constructor
@@ -19,6 +20,7 @@
                 {
                     // Abrimos la conexión
                     connection.Open();
+                    long respuesta;
 
                     // Definimos la consulta SQL que vamos a ejecutar
                     const string query = @"INSERT INTO ProductoVendido (Stock,IdProducto,IdVenta) 
@@ -33,24 +35,24 @@
 
                         // Ejecutamos la consulta SQL utilizando ExecuteScalar() que retorna el id generado para nuevo registro insertado
                         respuesta = (long)command.ExecuteScalar();
-                        connection.Close();
-                        return respuesta;
                     }
+                    connection.Close();
+                    productoVendidoResponse.Mensaje = "OK";
+                    productoVendidoResponse.Id = respuesta;
                 }
+                return productoVendidoResponse;
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return -1;
-                throw;
-
+                productoVendidoResponse.Mensaje = ex.Message;
+                return productoVendidoResponse;
             }
         }
 
         // Método para eliminar un ProductoVendido de la Base de Datos según su Id
-        public static bool EliminarProductoVendido(long id)
+        public static ProductoVendidoResponse EliminarProductoVendido(long id)
         {
-            bool respuesta;
+            ProductoVendidoResponse productoVendidoResponse = new ProductoVendidoResponse();
 
             try
             {
@@ -68,25 +70,30 @@
 
                         // Ejecutamos la consulta SQL utilizando ExecuteNonQuery() que retorna la cantidad de filas afectadas por la consulta SQL
                         // En este caso, debería ser 1 si se eliminó el usuario correctamente, o 0 si no se encontró el usuario con el Id correspondiente
-                        respuesta = command.ExecuteNonQuery() > 0;
+                        if (command.ExecuteNonQuery() > 0)
+                        {
+                            productoVendidoResponse.Mensaje = "OK";
+                        }
+                        else
+                        {
+                            productoVendidoResponse.Mensaje = "ERROR";
+                        };
                         connection.Close();
-                        return respuesta;
+                        return productoVendidoResponse;
                     }
                 }
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return false;
-                throw;
-
+                productoVendidoResponse.Mensaje = ex.Message;
+                return productoVendidoResponse;
             }
         }
 
         // Método para modificar un ProductoVendido existente en la Base de Datos
-        public static bool ModificarProductoVendido(ProductoVendido productoVendido)
+        public static ProductoVendidoResponse ModificarProductoVendido(ProductoVendido productoVendido)
         {
-            bool respuesta;
+            ProductoVendidoResponse productoVendidoResponse = new ProductoVendidoResponse();
 
             try
             {
@@ -108,25 +115,31 @@
 
                         // Ejecutamos la consulta SQL utilizando ExecuteNonQuery() que retorna la cantidad de filas afectadas por la consulta SQL
                         // En este caso, debería ser 1 si se modificó el usuario correctamente, o 0 si no se encontró el usuario con el Id correspondiente
-                        respuesta = command.ExecuteNonQuery() > 0;
+                        if (command.ExecuteNonQuery() > 0)
+                        {
+                            productoVendidoResponse.Mensaje = "OK";
+                        }
+                        else
+                        {
+                            productoVendidoResponse.Mensaje = "ERROR";
+                        };
                         connection.Close();
-                        return respuesta;
+                        return productoVendidoResponse;
                     }
                 }
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return false;
-                throw;
-
+                productoVendidoResponse.Mensaje = ex.Message;
+                return productoVendidoResponse;
             }
         }
 
         // Método para obtener la información de un ProductoVendido según su Id
-        public static ProductoVendido ObtenerProductoVendido(long id)
+        public static ProductoVendidoResponse ObtenerProductoVendido(long id)
         {
-            ProductoVendido respuesta = new ProductoVendido();
+            ProductoVendido productoVendido = new ProductoVendido();
+            ProductoVendidoResponse productoVendidoResponse = new ProductoVendidoResponse();
 
             try
             {
@@ -150,29 +163,30 @@
                             if (reader.Read())
                             {
                                 // Creamos un nuevo objeto ProductoVendido con la información obtenida del objeto SqlDataReader
-                                respuesta.Id = reader.GetInt64(0);
-                                respuesta.Stock = reader.GetInt32(1);
-                                respuesta.IdProducto = reader.GetInt64(2);
-                                respuesta.IdVenta = reader.GetInt64(3);
+                                productoVendido.Id = reader.GetInt64(0);
+                                productoVendido.Stock = reader.GetInt32(1);
+                                productoVendido.IdProducto = reader.GetInt64(2);
+                                productoVendido.IdVenta = reader.GetInt64(3);
                             }
                         }
-                        connection.Close();
-                        return respuesta;
                     }
+                    connection.Close();
+                    productoVendidoResponse.Mensaje = "OK";
+                    productoVendidoResponse.ProductoVendido = productoVendido;
                 }
+                return productoVendidoResponse;
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return null;
-                throw;
-
+                productoVendidoResponse.Mensaje = ex.Message;
+                return productoVendidoResponse;
             }
         }
 
         // Método para obtener el listado de productos vendidos en una Venta.
-        public static List<ProductoVendido> ObtenerProductosVentaPorId(long idVenta)
+        public static ProductoVendidoResponse ObtenerProductosVentaPorId(long idVenta)
         {
+            ProductoVendidoResponse productoVendidoResponse = new ProductoVendidoResponse();
             List<ProductoVendido> lista = new List<ProductoVendido>();
 
             try
@@ -209,21 +223,22 @@
                         }
                     }
                     connection.Close();
-                    return lista;
                 }
+                productoVendidoResponse.Mensaje = "OK";
+                productoVendidoResponse.ProductosVendidos = lista;
+                return productoVendidoResponse;
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return null;
-                throw;
-
+                productoVendidoResponse.Mensaje = ex.Message;
+                return productoVendidoResponse;
             }
         }
 
         // Método para obtener el listado de productos vendidos.
-        public static List<ProductoVendido> ListarProductosVendidos()
+        public static ProductoVendidoResponse ListarProductosVendidos()
         {
+            ProductoVendidoResponse productoVendidoResponse = new ProductoVendidoResponse();
             List<ProductoVendido> lista = new List<ProductoVendido>();
 
             try
@@ -257,14 +272,15 @@
                         }
                     }
                     connection.Close();
-                    return lista;
                 }
+                productoVendidoResponse.Mensaje = "OK";
+                productoVendidoResponse.ProductosVendidos = lista;
+                return productoVendidoResponse;
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return null;
-                throw;
+                productoVendidoResponse.Mensaje = ex.Message;
+                return productoVendidoResponse;
             }
         }
     }

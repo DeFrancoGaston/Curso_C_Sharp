@@ -2,6 +2,7 @@
 {
     using Microsoft.Data.SqlClient;
     using SistemaGestionEntities;
+    using SistemaGestionEntities.Responses;
 
     public static class VentaData
     {
@@ -9,9 +10,9 @@
         static string connectionString = "data source=DESKTOP-9M2BSDE\\MSSQLSERVER01;initial catalog=SistemaGestion;Trusted_Connection=True;TrustServerCertificate=true";
 
         // Método para insertar una nueva Venta en la Base de Datos
-        public static long CrearVenta(Venta venta)
+        public static VentaResponse CrearVenta(Venta venta)
         {
-            long respuesta;
+            VentaResponse ventaResponse = new VentaResponse();
 
             try
             {
@@ -20,6 +21,7 @@
                 {
                     // Abrimos la conexión
                     connection.Open();
+                    long respuesta;
 
                     // Definimos la consulta SQL que vamos a ejecutar
                     const string query = @"INSERT INTO Venta (Comentarios, IdUsuario) 
@@ -35,21 +37,22 @@
                         respuesta = (long)command.ExecuteScalar();
                     }
                     connection.Close();
-                    return respuesta;
+                    ventaResponse.Mensaje = "OK";
+                    ventaResponse.Id = respuesta;
                 }
+                return ventaResponse;
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return -1;
-                throw;
+                ventaResponse.Mensaje = ex.Message;
+                return ventaResponse;
             }
         }
 
         // Método para eliminar una Venta de la Base de Datos según su Id
-        public static bool EliminarVenta(long id)
+        public static VentaResponse EliminarVenta(long id)
         {
-            bool respuesta;
+            VentaResponse ventaResponse = new VentaResponse();
 
             try
             {
@@ -67,24 +70,30 @@
 
                         // Ejecutamos la consulta SQL utilizando ExecuteNonQuery() que retorna la cantidad de filas afectadas por la consulta SQL
                         // En este caso, debería ser 1 si se eliminó el usuario correctamente, o 0 si no se encontró el usuario con el Id correspondiente
-                        respuesta = command.ExecuteNonQuery() > 0;
+                        if (command.ExecuteNonQuery() > 0)
+                        {
+                            ventaResponse.Mensaje = "OK";
+                        }
+                        else
+                        {
+                            ventaResponse.Mensaje = "ERROR";
+                        };
+                        connection.Close();
+                        return ventaResponse;
                     }
-                    connection.Close();
-                    return respuesta;
                 }
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return false;
-                throw;
+                ventaResponse.Mensaje = ex.Message;
+                return ventaResponse;
             }
         }
 
         // Método para modificar un ProductoVendido existente en la Base de Datos
-        public static bool ModificarVenta(Venta venta)
+        public static VentaResponse ModificarVenta(Venta venta)
         {
-            bool respuesta;
+            VentaResponse ventaResponse = new VentaResponse();
 
             try
             {
@@ -103,23 +112,30 @@
                         command.Parameters.AddWithValue("@Id", venta.Id);
 
                         // Ejecutamos la consulta SQL utilizando ExecuteNonQuery() que retorna la cantidad de filas afectadas por la consulta SQL
-                        respuesta = command.ExecuteNonQuery() > 0;
+                        if (command.ExecuteNonQuery() > 0)
+                        {
+                            ventaResponse.Mensaje = "OK";
+                        }
+                        else
+                        {
+                            ventaResponse.Mensaje = "ERROR";
+                        };
+                        connection.Close();
+                        return ventaResponse;
                     }
-                    connection.Close();
-                    return respuesta;
                 }
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return false;
-                throw;
+                ventaResponse.Mensaje = ex.Message;
+                return ventaResponse;
             }
         }
 
         // Método para obtener la información de un ProductoVendido según su Id
-        public static Venta ObtenerVenta(long id)
+        public static VentaResponse ObtenerVenta(long id)
         {
+            VentaResponse ventaResponse = new VentaResponse();
             Venta respuesta = new Venta();
 
             try
@@ -151,20 +167,23 @@
                                 }
                             }
                         }
-                        connection.Close();
-                        return respuesta;
                     }
+                    connection.Close();
+                    ventaResponse.Mensaje = "OK";
+                    ventaResponse.Venta = respuesta;
                 }
+                return ventaResponse;
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return null;
-                throw;
+                ventaResponse.Mensaje = ex.Message;
+                return ventaResponse;
             }
         }
-        public static List<Venta> ListarVentas()
+
+        public static VentaResponse ListarVentas()
         {
+            VentaResponse ventaResponse = new VentaResponse();
             List<Venta> lista = new List<Venta>();
 
             try
@@ -200,13 +219,14 @@
                     }
                     connection.Close();
                 }
-                return lista;
+                ventaResponse.Mensaje = "OK";
+                ventaResponse.Ventas = lista;
+                return ventaResponse;
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return null;
-                throw;
+                ventaResponse.Mensaje = ex.Message;
+                return ventaResponse;
             }
         }
     }

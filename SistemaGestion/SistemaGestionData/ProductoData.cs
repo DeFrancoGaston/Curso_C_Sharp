@@ -2,6 +2,7 @@
 {
     using Microsoft.Data.SqlClient;
     using SistemaGestionEntities;
+    using SistemaGestionEntities.Responses;
 
     public static class ProductoData
     {
@@ -11,8 +12,9 @@
         // Método para insertar un nuevo Producto en la Base de Datos
         // Recibe un objeto Producto con la información del producto a crear
         // Devuelve el Id asignado al nuevo registro
-        public static long CrearProducto(Producto producto)
+        public static ProductoResponse CrearProducto(Producto producto)
         {
+            ProductoResponse productoResponse = new ProductoResponse();
             try
             {
                 // Creamos una nueva conexión a la base de datos utilizando el string de conexión que se recibió en el constructor
@@ -35,27 +37,30 @@
                         command.Parameters.AddWithValue("@PrecioVenta", producto.PrecioVenta);
                         command.Parameters.AddWithValue("@Stock", producto.Stock);
                         command.Parameters.AddWithValue("@IdUsuario", producto.IdUsuario);
+
+                        // Ejecutamos la consulta SQL utilizando ExecuteScalar() que retorna el id generado para nuevo registro insertado
                         respuesta = (long)command.ExecuteScalar();
                     }
-                    // Ejecutamos la consulta SQL utilizando ExecuteScalar() que retorna el id generado para nuevo registro insertado
                     connection.Close();
-                    return respuesta;
+                    productoResponse.Mensaje = "OK";
+                    productoResponse.Id = respuesta;
                 }
+                return productoResponse;
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return -1;
-                throw;
+                productoResponse.Mensaje = ex.Message;
+                return productoResponse;
             }
         }
 
         // Método para eliminar un producto de la Base de Datos según su Id
         // Recibe el Id del producto que se desea eliminar
         // Devuelve true si la eliminación fue exitosa, false si no
-        public static bool EliminarProducto(long id)
+        public static ProductoResponse EliminarProducto(long id)
         {
-            bool respuesta;
+            ProductoResponse productoResponse = new ProductoResponse();
+
             try
             {
                 using (var connection = new SqlConnection(connectionString))
@@ -72,27 +77,34 @@
 
                         // Ejecutamos la consulta SQL utilizando ExecuteNonQuery() que retorna la cantidad de filas afectadas por la consulta SQL
                         // En este caso, debería ser 1 si se eliminó el producto correctamente, o 0 si no se encontró el producto con el Id correspondiente
-                        respuesta = command.ExecuteNonQuery() > 0;
+                        if (command.ExecuteNonQuery() > 0)
+                        {
+                            productoResponse.Mensaje = "OK";
+                        }
+                        else
+                        {
+                            productoResponse.Mensaje = "ERROR";
+                        };
                         connection.Close();
-                        return respuesta;
+                        return productoResponse;
                     }
 
                 }
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return false;
-                throw;
+                productoResponse.Mensaje = ex.Message;
+                return productoResponse;
             }
         }
 
         // Método para modificar un producto existente en la Base de Datos
         // Recibe un objeto Producto con la información actualizada del producto a modificar
         // Devuelve true si la modificación fue exitosa, false si no
-        public static bool ModificarProducto(Producto producto)
+        public static ProductoResponse ModificarProducto(Producto producto)
         {
-            bool respuesta;
+            ProductoResponse productoResponse = new ProductoResponse();
+
             try
             {
                 using (var connection = new SqlConnection(connectionString))
@@ -116,26 +128,32 @@
 
                         // Ejecutamos la consulta SQL utilizando ExecuteNonQuery() que retorna la cantidad de filas afectadas por la consulta SQL
                         // En este caso, debería ser 1 si se modificó el producto correctamente, o 0 si no se encontró el producto con el Id correspondiente
-                        respuesta = command.ExecuteNonQuery() > 0;
+                        if (command.ExecuteNonQuery() > 0)
+                        {
+                            productoResponse.Mensaje = "OK";
+                        }
+                        else
+                        {
+                            productoResponse.Mensaje = "ERROR";
+                        };
                         connection.Close();
-                        return respuesta;
+                        return productoResponse;
                     }
                 }
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return false;
-                throw;
-
+                productoResponse.Mensaje = ex.Message;
+                return productoResponse;
             }
         }
 
         // Método para obtener la información de un producto según su Id
         // Recibe el Id del producto que se desea obtener
         // Devuelve un objeto Producto con la información correspondiente, o null si no se encontró
-        public static Producto ObtenerProducto(long id)
+        public static ProductoResponse ObtenerProducto(long id)
         {
+            ProductoResponse productoResponse = new ProductoResponse();
             Producto producto = new Producto();
 
             try
@@ -172,20 +190,21 @@
                         }
                     }
                     connection.Close();
+                    productoResponse.Mensaje = "OK";
+                    productoResponse.Producto = producto;
                 }
-                return producto;
+                return productoResponse;
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return null;
-                throw;
-
+                productoResponse.Mensaje = ex.Message;
+                return productoResponse;
             }
         }
 
-        public static List<Producto> ListarProductos()
+        public static ProductoResponse ListarProductos()
         {
+            ProductoResponse productoResponse = new ProductoResponse();
             List<Producto> lista = new List<Producto>();
 
             try
@@ -224,13 +243,14 @@
                     }
                     connection.Close();
                 }
-                return lista;
+                productoResponse.Mensaje = "OK";
+                productoResponse.Productos = lista;
+                return productoResponse;
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString());
-                //return null;
-                throw;
+                productoResponse.Mensaje = ex.Message;
+                return productoResponse;
             }
         }
     }
