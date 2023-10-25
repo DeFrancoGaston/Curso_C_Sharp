@@ -1,58 +1,76 @@
 ﻿using SistemaGestionData;
 using SistemaGestionEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SistemaGestionEntities.Responses;
 
 namespace SistemaGestionBussiness
 {
     public static class VentaBussiness
     {
-        public static List<Venta> ListarVentas()
+        public static VentaResponse ListarVentas()
         {
-            try
-            {
-                return VentaData.ListarVentas();
-            }
-            catch (Exception e) { throw;}
+            return VentaData.ListarVentas();
         }
 
-        public static long CrearVenta(Venta venta)
+        public static VentaResponse CrearVenta(Venta venta)
         {
-            try
-            {
-                return VentaData.CrearVenta(venta);
-            }
-            catch (Exception e) { throw; }
+            return VentaData.CrearVenta(venta);
         }
 
-        public static bool EliminarVenta(long id)
+        public static VentaResponse EliminarVenta(long id)
         {
-            try
-            {
-                return VentaData.EliminarVenta(id);
-            }
-            catch (Exception e) { throw; }
+            return VentaData.EliminarVenta(id);
         }
 
-        public static bool ModificarVenta(Venta venta)
+        public static VentaResponse ModificarVenta(Venta venta)
         {
-            try
-            {
-                return VentaData.ModificarVenta(venta);
-            }
-            catch (Exception e) { throw; }
+            return VentaData.ModificarVenta(venta);
         }
 
-        public static Venta ObtenerVenta(long id)
+        public static VentaResponse ObtenerVenta(long id)
         {
+            return VentaData.ObtenerVenta(id);
+        }
+
+        public static VentaResponse CargarVenta(long idusuario, List<ProductoVendido> listproductosvendidos)
+        {
+            Venta venta = new Venta();
+            VentaResponse ventaResponse = new VentaResponse();
+
             try
             {
-                return VentaData.ObtenerVenta(id);
+                long idVenta;
+                venta.IdUsuario = idusuario;
+                venta.Comentarios = "Generadas desde el API";
+
+                ventaResponse = VentaBussiness.CrearVenta(venta);
+                if (!(ventaResponse.Mensaje == "OK"))
+                {
+                    return ventaResponse;
+                }
+
+                idVenta = ventaResponse.Id;
+
+                foreach(ProductoVendido prodvendido in listproductosvendidos)
+                {
+                    prodvendido.IdVenta = idVenta;
+                    ProductoVendidoResponse productoVendidoResponse = ProductoVendidoBussiness.CrearProductoVendido(prodvendido);
+
+                    if (!(productoVendidoResponse.Mensaje == "OK"))
+                    {
+                        ventaResponse.Mensaje = productoVendidoResponse.Mensaje;
+                        return ventaResponse;
+                    }
+                }
+
+                ventaResponse.Id = idVenta;
+                return ventaResponse;
             }
-            catch (Exception e) { throw; }
+            catch (Exception ex)
+            {
+                ventaResponse.Mensaje = ex.Message;
+                return ventaResponse;
+            }
         }
+
     }
 }

@@ -1,53 +1,69 @@
 ﻿using SistemaGestionData;
 using SistemaGestionEntities;
+using SistemaGestionEntities.Responses;
 
 namespace SistemaGestionBussiness
 {
     public static class ProductoVendidoBussiness
     {
-        public static List<ProductoVendido> ListarProductoVendidos()
+        public static ProductoVendidoResponse ListarProductoVendidos()
         {
-            try
-            {
-                return ProductoVendidoData.ListarProductosVendidos();
-            }
-            catch (Exception e) { throw; }
+            return ProductoVendidoData.ListarProductosVendidos();
         }
 
-        public static long CrearProductoVendido(ProductoVendido productoVendido)
+        public static ProductoVendidoResponse CrearProductoVendido(ProductoVendido productoVendido)
         {
+            ProductoResponse productoResponse = new ProductoResponse();
+            ProductoVendidoResponse productoVendidoResponse = new ProductoVendidoResponse();
             try
             {
+                productoResponse = ProductoBussiness.ObtenerProducto(productoVendido.IdProducto);
+
+                if (!(productoResponse.Mensaje == "OK"))
+                {
+                    productoVendidoResponse.Mensaje = productoVendidoResponse.Mensaje;
+                    return productoVendidoResponse;
+                }
+
+                if (productoResponse.Producto.Stock < productoVendido.Stock)
+                {
+                    productoVendidoResponse.Mensaje = "Stock insuficiente.";
+                    return productoVendidoResponse;
+                }
+
+                productoResponse.Producto.Stock -= productoVendido.Stock;
+
+                productoResponse = ProductoBussiness.ModificarProducto(productoResponse.Producto);
+
+                if (!(productoResponse.Mensaje == "OK"))
+                {
+                    productoVendidoResponse.Mensaje = productoVendidoResponse.Mensaje;
+                    return productoVendidoResponse;
+                }
+
+                //productoVendidoResponse = ProductoVendidoData.CrearProductoVendido(productoVendido);
                 return ProductoVendidoData.CrearProductoVendido(productoVendido);
             }
-            catch (Exception e) { throw; }
+            catch (Exception ex)
+            {
+                productoVendidoResponse.Mensaje = ex.Message;
+                return productoVendidoResponse;
+            }
         }
 
-        public static bool EliminarProductoVendido(long id)
+        public static ProductoVendidoResponse EliminarProductoVendido(long id)
         {
-            try
-            {
-                return ProductoVendidoData.EliminarProductoVendido(id);
-            }
-            catch (Exception e) { throw; }
+            return ProductoVendidoData.EliminarProductoVendido(id);
         }
 
-        public static bool ModificarProductoVendido(ProductoVendido productoVendido)
+        public static ProductoVendidoResponse ModificarProductoVendido(ProductoVendido productoVendido)
         {
-            try
-            {
-                return ProductoVendidoData.ModificarProductoVendido(productoVendido);
-            }
-            catch (Exception e) { throw; }
+            return ProductoVendidoData.ModificarProductoVendido(productoVendido);
         }
 
-        public static ProductoVendido ObtenerProductoVendido(long id)
+        public static ProductoVendidoResponse ObtenerProductoVendido(long id)
         {
-            try
-            {
-                return ProductoVendidoData.ObtenerProductoVendido(id);
-            }
-            catch (Exception e) { throw; }
+            return ProductoVendidoData.ObtenerProductoVendido(id);
         }
 
     }

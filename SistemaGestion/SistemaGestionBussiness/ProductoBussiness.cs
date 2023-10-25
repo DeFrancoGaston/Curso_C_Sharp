@@ -1,53 +1,34 @@
 ﻿using SistemaGestionData;
 using SistemaGestionEntities;
+using SistemaGestionEntities.Responses;
 
 namespace SistemaGestionBussiness
 {
     public static class ProductoBussiness
     {
-        public static List<Producto> ListarProductos()
+        public static ProductoResponse ListarProductos()
         {
-            try
-            {
-                return ProductoData.ListarProductos();
-            }
-            catch (Exception e) { throw; }
+            return ProductoData.ListarProductos();
         }
 
-        public static long CrearProducto(Producto producto)
+        public static ProductoResponse CrearProducto(Producto producto)
         {
-            try
-            {
-                return ProductoData.CrearProducto(producto);
-            }
-            catch (Exception e) { throw; }
+            return ProductoData.CrearProducto(producto);
         }
 
-        public static bool EliminarProducto(long id)
+        public static ProductoResponse EliminarProducto(long id)
         {
-            try
-            {
-                return ProductoData.EliminarProducto(id);
-            }
-            catch (Exception e) { throw; }
+            return ProductoData.EliminarProducto(id);
         }
 
-        public static bool ModificarProducto(Producto producto)
+        public static ProductoResponse ModificarProducto(Producto producto)
         {
-            try
-            {
-                return ProductoData.ModificarProducto(producto);
-            }
-            catch (Exception e) { throw; }
+            return ProductoData.ModificarProducto(producto);
         }
 
-        public static Producto ObtenerProducto(long id)
+        public static ProductoResponse ObtenerProducto(long id)
         {
-            try
-            {
-                return ProductoData.ObtenerProducto(id);
-            }
-            catch (Exception e) { throw; }
+            return ProductoData.ObtenerProducto(id);
         }
     }
 }
