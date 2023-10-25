@@ -3,6 +3,7 @@
 namespace SistemaGestionUI
 {
     using SistemaGestionEntities;
+    using SistemaGestionEntities.Responses;
     using SistemaGestionBussiness;
 
     public partial class frm_Producto_ABM : Form
@@ -68,10 +69,12 @@ namespace SistemaGestionUI
 
         private void btn_guardar_Click(object sender, EventArgs e)
         {
+            Producto producto = new Producto();
+            ProductoResponse productoResponse = new ProductoResponse();
+            string msj = "";
+
             try
             {
-                Producto producto = new Producto();
-
                 switch (abm)
                 {
                     case 'A':
@@ -81,11 +84,13 @@ namespace SistemaGestionUI
                         producto.Stock = int.Parse(nud_stock.Text);
                         producto.IdUsuario = long.Parse(txtb_idusuario.Text);
 
-                        ProductoBussiness.CrearProducto(producto);
+                        productoResponse = ProductoBussiness.CrearProducto(producto);
+                        msj = "Se insertaron los datos correctamente.";
                         break;
                     case 'B':
                         long id = long.Parse(txtb_id.Text);
-                        ProductoBussiness.EliminarProducto(id);
+                        productoResponse = ProductoBussiness.EliminarProducto(id);
+                        msj = "Se borro el registro correctamente.";
                         break;
                     case 'M':
                         producto.Id = long.Parse(txtb_id.Text);
@@ -95,14 +100,22 @@ namespace SistemaGestionUI
                         producto.Stock = int.Parse(nud_stock.Text);
                         producto.IdUsuario = long.Parse(txtb_idusuario.Text);
 
-                        ProductoBussiness.ModificarProducto(producto);
+                        productoResponse = ProductoBussiness.ModificarProducto(producto);
+                        msj = "Se actualizaron los datos correctamente.";
                         break;
+                }
+
+                if (productoResponse.Mensaje == "OK")
+                {
+                    MessageBox.Show(msj);
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show(productoResponse.Mensaje);
                 }
             }
             catch (Exception ex) { throw; };
-
-            this.Close();
         }
-
     }
 }

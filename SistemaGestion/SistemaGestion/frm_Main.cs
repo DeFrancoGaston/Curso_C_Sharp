@@ -1,5 +1,7 @@
 ﻿using SistemaGestionBussiness;
 using SistemaGestionEntities;
+using SistemaGestionEntities.Responses;
+using System.Security.Cryptography;
 
 namespace SistemaGestionUI
 {
@@ -9,6 +11,13 @@ namespace SistemaGestionUI
         public frm_Main()
         {
             InitializeComponent();
+        }
+
+        public frm_Main(frm_Login frm_login)
+        {
+            InitializeComponent();
+
+            frm_login.Close();
         }
 
         private void frm_Main_Load(object sender, EventArgs e)
@@ -22,20 +31,52 @@ namespace SistemaGestionUI
             switch (entidad)
             {
                 case "Usuario":
-                    List<Usuario> listaUsuario = UsuarioBussiness.ListarUsuarios();
-                    dgv_data.DataSource = listaUsuario;
+                    UsuarioResponse usuarioResponse = UsuarioBussiness.ListarUsuarios();
+
+                    if (usuarioResponse.Mensaje == "OK")
+                    {
+                        dgv_data.DataSource = usuarioResponse.Usuarios;
+                    }
+                    else
+                    {
+                        MessageBox.Show(usuarioResponse.Mensaje);
+                    }
                     break;
                 case "Producto":
-                    List<Producto> listaProducto = ProductoBussiness.ListarProductos();
-                    dgv_data.DataSource = listaProducto;
+                    ProductoResponse productoResponse = ProductoBussiness.ListarProductos();
+
+                    if (productoResponse.Mensaje == "OK")
+                    {
+                        dgv_data.DataSource = productoResponse.Productos;
+                    }
+                    else
+                    {
+                        MessageBox.Show(productoResponse.Mensaje);
+                    }
                     break;
                 case "Venta":
-                    List<Venta> listaVenta = VentaBussiness.ListarVentas();
-                    dgv_data.DataSource = listaVenta;
+                    VentaResponse ventaResponse = VentaBussiness.ListarVentas();
+
+                    if (ventaResponse.Mensaje == "OK")
+                    {
+                        dgv_data.DataSource = ventaResponse.Ventas;
+                    }
+                    else
+                    {
+                        MessageBox.Show(ventaResponse.Mensaje);
+                    }
                     break;
                 case "ProductoVendido":
-                    List<ProductoVendido> listaProductoVendido = ProductoVendidoBussiness.ListarProductoVendidos();
-                    dgv_data.DataSource = listaProductoVendido;
+                    ProductoVendidoResponse productoVendidoResponse = ProductoVendidoBussiness.ListarProductoVendidos();
+
+                    if (productoVendidoResponse.Mensaje == "OK")
+                    {
+                        dgv_data.DataSource = productoVendidoResponse.ProductosVendidos;
+                    }
+                    else
+                    {
+                        MessageBox.Show(productoVendidoResponse.Mensaje);
+                    }
                     break;
             }
         }
@@ -130,31 +171,37 @@ namespace SistemaGestionUI
             if (rbtn_usuario.Checked)
             {
                 long id_usuario = (long)dgv_data.CurrentRow.Cells[0].Value;
-                var usuario = UsuarioBussiness.ObtenerUsuario(id_usuario);
+                UsuarioResponse usuarioResponse = UsuarioBussiness.ObtenerUsuario(id_usuario);
 
-                frm_Usuario_ABM frmUsuarioABM = new frm_Usuario_ABM(usuario, 'M');
-                frmUsuarioABM.FormClosed += Frm_Main_FormClosed;
-                frmUsuarioABM.ShowDialog();
+                if (usuarioResponse.Mensaje == "OK")
+                {
+                    frm_Usuario_ABM frmUsuarioABM = new frm_Usuario_ABM(usuarioResponse.Usuario, 'M');
+                    frmUsuarioABM.FormClosed += Frm_Main_FormClosed;
+                    frmUsuarioABM.ShowDialog();
+                }
             }
 
             //Productos
             if (rbtn_producto.Checked)
             {
                 long id_producto = (long)dgv_data.CurrentRow.Cells[0].Value;
-                var producto = ProductoBussiness.ObtenerProducto(id_producto);
+                ProductoResponse productoResponse = ProductoBussiness.ObtenerProducto(id_producto);
 
-                frm_Producto_ABM frmProductoABM = new frm_Producto_ABM(producto, 'M');
-                frmProductoABM.FormClosed += Frm_Main_FormClosed;
-                frmProductoABM.ShowDialog();
+                if (productoResponse.Mensaje == "OK")
+                {
+                    frm_Producto_ABM frmProductoABM = new frm_Producto_ABM(productoResponse.Producto, 'M');
+                    frmProductoABM.FormClosed += Frm_Main_FormClosed;
+                    frmProductoABM.ShowDialog();
+                }
             }
 
             //Venta
             if (rbtn_venta.Checked)
             {
                 long id_venta = (long)dgv_data.CurrentRow.Cells[0].Value;
-                var venta = VentaBussiness.ObtenerVenta(id_venta);
+                VentaResponse ventaResponse = VentaBussiness.ObtenerVenta(id_venta);
 
-                frm_Venta_ABM frmVentaABM = new frm_Venta_ABM(venta, 'M');
+                frm_Venta_ABM frmVentaABM = new frm_Venta_ABM(ventaResponse.Venta, 'M');
                 frmVentaABM.FormClosed += Frm_Main_FormClosed;
                 frmVentaABM.ShowDialog();
             }
@@ -163,11 +210,14 @@ namespace SistemaGestionUI
             if (rbtn_productovendido.Checked)
             {
                 long id_productovendido = (long)dgv_data.CurrentRow.Cells[0].Value;
-                var productovendido = ProductoVendidoBussiness.ObtenerProductoVendido(id_productovendido);
+                ProductoVendidoResponse productoVendidoResponse = ProductoVendidoBussiness.ObtenerProductoVendido(id_productovendido);
 
-                frm_ProductoVendido_ABM frmProductoVendidoABM = new frm_ProductoVendido_ABM(productovendido, 'M');
-                frmProductoVendidoABM.FormClosed += Frm_Main_FormClosed;
-                frmProductoVendidoABM.ShowDialog();
+                if (productoVendidoResponse.Mensaje == "OK")
+                {
+                    frm_ProductoVendido_ABM frmProductoVendidoABM = new frm_ProductoVendido_ABM(productoVendidoResponse.ProductoVendido, 'M');
+                    frmProductoVendidoABM.FormClosed += Frm_Main_FormClosed;
+                    frmProductoVendidoABM.ShowDialog();
+                }
             }
         }
 
@@ -180,45 +230,62 @@ namespace SistemaGestionUI
             if (rbtn_usuario.Checked)
             {
                 long id_usuario = (long)dgv_data.CurrentRow.Cells[0].Value;
-                var usuario = UsuarioBussiness.ObtenerUsuario(id_usuario);
+                UsuarioResponse usuarioResponse = UsuarioBussiness.ObtenerUsuario(id_usuario);
 
-                frm_Usuario_ABM frmUsuarioABM = new frm_Usuario_ABM(usuario, 'B');
-                frmUsuarioABM.FormClosed += Frm_Main_FormClosed;
-                frmUsuarioABM.ShowDialog();
+                if (usuarioResponse.Mensaje == "OK")
+                {
+                    frm_Usuario_ABM frmUsuarioABM = new frm_Usuario_ABM(usuarioResponse.Usuario, 'B');
+                    frmUsuarioABM.FormClosed += Frm_Main_FormClosed;
+                    frmUsuarioABM.ShowDialog();
+                }
             }
 
             //Productos
             if (rbtn_producto.Checked)
             {
                 long id_producto = (long)dgv_data.CurrentRow.Cells[0].Value;
-                var producto = ProductoBussiness.ObtenerProducto(id_producto);
+                ProductoResponse productoResponse = ProductoBussiness.ObtenerProducto(id_producto);
 
-                frm_Producto_ABM frmProductoABM = new frm_Producto_ABM(producto, 'B');
-                frmProductoABM.FormClosed += Frm_Main_FormClosed;
-                frmProductoABM.ShowDialog();
+                if (productoResponse.Mensaje == "OK")
+                {
+                    frm_Producto_ABM frmProductoABM = new frm_Producto_ABM(productoResponse.Producto, 'B');
+                    frmProductoABM.FormClosed += Frm_Main_FormClosed;
+                    frmProductoABM.ShowDialog();
+                }
             }
 
             //Venta
             if (rbtn_venta.Checked)
             {
                 long id_venta = (long)dgv_data.CurrentRow.Cells[0].Value;
-                var venta = VentaBussiness.ObtenerVenta(id_venta);
+                VentaResponse ventaResponse = VentaBussiness.ObtenerVenta(id_venta);
 
-                frm_Venta_ABM frmVentaABM = new frm_Venta_ABM(venta, 'B');
-                frmVentaABM.FormClosed += Frm_Main_FormClosed;
-                frmVentaABM.ShowDialog();
+                if (ventaResponse.Mensaje == "OK")
+                {
+                    frm_Venta_ABM frmVentaABM = new frm_Venta_ABM(ventaResponse.Venta, 'B');
+                    frmVentaABM.FormClosed += Frm_Main_FormClosed;
+                    frmVentaABM.ShowDialog();
+                }
             }
 
             //Producto Vendido
             if (rbtn_productovendido.Checked)
             {
                 long id_productovendido = (long)dgv_data.CurrentRow.Cells[0].Value;
-                var productovendido = ProductoVendidoBussiness.ObtenerProductoVendido(id_productovendido);
+                ProductoVendidoResponse productoVendidoResponse = ProductoVendidoBussiness.ObtenerProductoVendido(id_productovendido);
 
-                frm_ProductoVendido_ABM frmProductoVentidoABM = new frm_ProductoVendido_ABM(productovendido, 'B');
-                frmProductoVentidoABM.FormClosed += Frm_Main_FormClosed;
-                frmProductoVentidoABM.ShowDialog();
+                if (productoVendidoResponse.Mensaje == "OK")
+                {
+                    frm_ProductoVendido_ABM frmProductoVentidoABM = new frm_ProductoVendido_ABM(productoVendidoResponse.ProductoVendido, 'B');
+                    frmProductoVentidoABM.FormClosed += Frm_Main_FormClosed;
+                    frmProductoVentidoABM.ShowDialog();
+                }
             }
+        }
+
+        private void frm_Main_FormClosed_1(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

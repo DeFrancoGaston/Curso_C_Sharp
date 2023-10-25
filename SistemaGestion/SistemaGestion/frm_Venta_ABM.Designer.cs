@@ -61,7 +61,7 @@
             txtb_idusuario.Location = new Point(133, 102);
             txtb_idusuario.Name = "txtb_idusuario";
             txtb_idusuario.Size = new Size(223, 25);
-            txtb_idusuario.TabIndex = 3;
+            txtb_idusuario.TabIndex = 2;
             // 
             // label1
             // 
@@ -78,7 +78,7 @@
             btn_accion.Location = new Point(195, 263);
             btn_accion.Name = "btn_accion";
             btn_accion.Size = new Size(75, 23);
-            btn_accion.TabIndex = 10;
+            btn_accion.TabIndex = 3;
             btn_accion.Text = "Accion.";
             btn_accion.UseVisualStyleBackColor = true;
             btn_accion.Click += btn_guardar_Click;

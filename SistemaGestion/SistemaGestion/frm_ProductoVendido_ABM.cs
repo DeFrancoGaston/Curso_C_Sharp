@@ -4,6 +4,7 @@ namespace SistemaGestionUI
 {
     using SistemaGestionEntities;
     using SistemaGestionBussiness;
+    using SistemaGestionEntities.Responses;
 
     public partial class frm_ProductoVendido_ABM : Form
     {
@@ -62,6 +63,8 @@ namespace SistemaGestionUI
             try
             {
                 ProductoVendido productovendido = new ProductoVendido();
+                ProductoVendidoResponse productoVendidoResponse = new ProductoVendidoResponse();
+                string msj = "";
 
                 switch (abm)
                 {
@@ -70,11 +73,13 @@ namespace SistemaGestionUI
                         productovendido.IdProducto = long.Parse(txtb_IdProducto.Text);
                         productovendido.IdVenta = long.Parse(txtb_IdVenta.Text);
 
-                        ProductoVendidoBussiness.CrearProductoVendido(productovendido);
+                        productoVendidoResponse = ProductoVendidoBussiness.CrearProductoVendido(productovendido);
+                        msj = "Se insertaron los datos correctamente.";
                         break;
                     case 'B':
                         long id = long.Parse(txtb_id.Text);
-                        ProductoVendidoBussiness.EliminarProductoVendido(id);
+                        productoVendidoResponse = ProductoVendidoBussiness.EliminarProductoVendido(id);
+                        msj = "Se borro el registro correctamente.";
                         break;
                     case 'M':
                         productovendido.Id = long.Parse(txtb_id.Text);
@@ -82,13 +87,21 @@ namespace SistemaGestionUI
                         productovendido.IdProducto = long.Parse(txtb_IdProducto.Text);
                         productovendido.IdVenta = long.Parse(txtb_IdVenta.Text);
 
-                        ProductoVendidoBussiness.ModificarProductoVendido(productovendido);
+                        productoVendidoResponse = ProductoVendidoBussiness.ModificarProductoVendido(productovendido);
+                        msj = "Se actualizaron los datos correctamente.";
                         break;
+                }
+                if (productoVendidoResponse.Mensaje == "OK")
+                {
+                    MessageBox.Show(msj);
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show(productoVendidoResponse.Mensaje);
                 }
             }
             catch (Exception ex) { throw; };
-
-            this.Close();
         }
 
     }

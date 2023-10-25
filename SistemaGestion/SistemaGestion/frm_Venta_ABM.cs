@@ -3,6 +3,7 @@
 namespace SistemaGestionUI
 {
     using SistemaGestionEntities;
+    using SistemaGestionEntities.Responses;
     using SistemaGestionBussiness;
 
     public partial class frm_Venta_ABM : Form
@@ -58,6 +59,8 @@ namespace SistemaGestionUI
             try
             {
                 Venta venta = new Venta();
+                VentaResponse ventaResponse = new VentaResponse();
+                string msj = "";
 
                 switch (abm)
                 {
@@ -65,24 +68,34 @@ namespace SistemaGestionUI
                         venta.Comentarios = txtb_comentarios.Text;
                         venta.IdUsuario = long.Parse(txtb_idusuario.Text);
 
-                        VentaBussiness.CrearVenta(venta);
+                        ventaResponse = VentaBussiness.CrearVenta(venta);
+                        msj = "Se insertaron los datos correctamente.";
                         break;
                     case 'B':
                         long id = long.Parse(txtb_id.Text);
-                        VentaBussiness.EliminarVenta(id);
+                        ventaResponse = VentaBussiness.EliminarVenta(id);
+                        msj = "Se borro el registro correctamente.";
                         break;
                     case 'M':
                         venta.Id = long.Parse(txtb_id.Text);
                         venta.Comentarios = txtb_comentarios.Text;
                         venta.IdUsuario = long.Parse(txtb_idusuario.Text);
 
-                        VentaBussiness.ModificarVenta(venta);
+                        ventaResponse = VentaBussiness.ModificarVenta(venta);
+                        msj = "Se actualizaron los datos correctamente.";
                         break;
+                }
+                if (ventaResponse.Mensaje == "OK")
+                {
+                    MessageBox.Show(msj);
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show(ventaResponse.Mensaje);
                 }
             }
             catch (Exception ex) { throw; };
-
-            this.Close();
         }
 
     }

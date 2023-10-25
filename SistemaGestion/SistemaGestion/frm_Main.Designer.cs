@@ -143,6 +143,7 @@
             Controls.Add(rbtn_usuario);
             Name = "frm_Main";
             Text = "Sistema Gestión";
+            FormClosed += frm_Main_FormClosed_1;
             Load += frm_Main_Load;
             ((System.ComponentModel.ISupportInitialize)dgv_data).EndInit();
             ResumeLayout(false);

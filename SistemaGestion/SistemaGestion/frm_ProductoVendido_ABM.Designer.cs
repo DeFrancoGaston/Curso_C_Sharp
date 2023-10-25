@@ -56,7 +56,7 @@
             txtb_IdProducto.Location = new Point(133, 102);
             txtb_IdProducto.Name = "txtb_IdProducto";
             txtb_IdProducto.Size = new Size(223, 25);
-            txtb_IdProducto.TabIndex = 3;
+            txtb_IdProducto.TabIndex = 2;
             // 
             // label1
             // 
@@ -74,7 +74,7 @@
             txtb_IdVenta.Location = new Point(133, 137);
             txtb_IdVenta.Name = "txtb_IdVenta";
             txtb_IdVenta.Size = new Size(223, 25);
-            txtb_IdVenta.TabIndex = 5;
+            txtb_IdVenta.TabIndex = 3;
             // 
             // label2
             // 
@@ -91,7 +91,7 @@
             btn_accion.Location = new Point(195, 263);
             btn_accion.Name = "btn_accion";
             btn_accion.Size = new Size(75, 23);
-            btn_accion.TabIndex = 10;
+            btn_accion.TabIndex = 4;
             btn_accion.Text = "Accion.";
             btn_accion.UseVisualStyleBackColor = true;
             btn_accion.Click += btn_guardar_Click;
@@ -121,7 +121,7 @@
             nud_stock.Maximum = new decimal(new int[] { 999999999, 0, 0, 0 });
             nud_stock.Name = "nud_stock";
             nud_stock.Size = new Size(223, 23);
-            nud_stock.TabIndex = 13;
+            nud_stock.TabIndex = 1;
             // 
             // frm_ProductoVendido_ABM
             // 

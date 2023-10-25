@@ -50,3 +50,4 @@ C:\Users\Note\source\repos\SistemaGestion\SistemaGestion\obj\Debug\net6.0-window
 C:\Users\Note\source\repos\SistemaGestion\SistemaGestion\obj\Debug\net6.0-windows\SistemaGestionUI.frm_Producto_ABM.resources
 C:\Users\Note\source\repos\SistemaGestion\SistemaGestion\obj\Debug\net6.0-windows\SistemaGestionUI.frm_Usuario_ABM.resources
 C:\Users\Note\source\repos\SistemaGestion\SistemaGestion\obj\Debug\net6.0-windows\SistemaGestionUI.frm_Venta_ABM.resources
+C:\Users\Note\source\repos\SistemaGestion\SistemaGestion\obj\Debug\net6.0-windows\SistemaGestionUI.frm_Login.resources

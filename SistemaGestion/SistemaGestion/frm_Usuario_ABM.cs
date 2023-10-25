@@ -3,6 +3,7 @@
 namespace SistemaGestionUI
 {
     using SistemaGestionEntities;
+    using SistemaGestionEntities.Responses;
     using SistemaGestionBussiness;
 
     public partial class frm_Usuario_ABM : Form
@@ -70,7 +71,9 @@ namespace SistemaGestionUI
             try
             {
                 Usuario usuario = new Usuario();
-                
+                UsuarioResponse usuarioResponse = new UsuarioResponse();
+                string msj = "";
+
                 switch (abm)
                 {
                     case 'A':
@@ -80,11 +83,13 @@ namespace SistemaGestionUI
                         usuario.Contraseña = txtb_contraseña.Text;
                         usuario.Mail = txtb_mail.Text;
 
-                        UsuarioBussiness.CrearUsuario(usuario);
+                        usuarioResponse = UsuarioBussiness.CrearUsuario(usuario);
+                        msj = "Se insertaron los datos correctamente.";
                         break;
                     case 'B':
                         long id = long.Parse(txtb_id.Text);
-                        UsuarioBussiness.EliminarUsuario(id);
+                        usuarioResponse = UsuarioBussiness.EliminarUsuario(id);
+                        msj = "Se borro el registro correctamente.";
                         break;
                     case 'M':
                         usuario.Id = long.Parse(txtb_id.Text);
@@ -94,13 +99,21 @@ namespace SistemaGestionUI
                         usuario.Contraseña = txtb_contraseña.Text;
                         usuario.Mail = txtb_mail.Text;
 
-                        UsuarioBussiness.ModificarUsuario(usuario);
+                        usuarioResponse = UsuarioBussiness.ModificarUsuario(usuario);
+                        msj = "Se actualizaron los datos correctamente.";
                         break;
+                }
+                if (usuarioResponse.Mensaje == "OK")
+                {
+                    MessageBox.Show(msj);
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show(usuarioResponse.Mensaje);
                 }
             }
             catch (Exception ex) { throw; };
-
-            this.Close();
         }
 
     }

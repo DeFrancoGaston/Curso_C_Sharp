@@ -67,7 +67,7 @@
             txtb_apellido.Location = new Point(133, 102);
             txtb_apellido.Name = "txtb_apellido";
             txtb_apellido.Size = new Size(223, 25);
-            txtb_apellido.TabIndex = 3;
+            txtb_apellido.TabIndex = 2;
             // 
             // label1
             // 
@@ -85,7 +85,7 @@
             txtb_usuario.Location = new Point(133, 137);
             txtb_usuario.Name = "txtb_usuario";
             txtb_usuario.Size = new Size(223, 25);
-            txtb_usuario.TabIndex = 5;
+            txtb_usuario.TabIndex = 3;
             // 
             // label2
             // 
@@ -103,7 +103,7 @@
             txtb_contraseña.Location = new Point(133, 175);
             txtb_contraseña.Name = "txtb_contraseña";
             txtb_contraseña.Size = new Size(223, 25);
-            txtb_contraseña.TabIndex = 7;
+            txtb_contraseña.TabIndex = 4;
             // 
             // label3
             // 
@@ -121,7 +121,7 @@
             txtb_mail.Location = new Point(133, 210);
             txtb_mail.Name = "txtb_mail";
             txtb_mail.Size = new Size(223, 25);
-            txtb_mail.TabIndex = 9;
+            txtb_mail.TabIndex = 5;
             // 
             // label4
             // 
@@ -138,7 +138,7 @@
             btn_accion.Location = new Point(195, 263);
             btn_accion.Name = "btn_accion";
             btn_accion.Size = new Size(75, 23);
-            btn_accion.TabIndex = 10;
+            btn_accion.TabIndex = 6;
             btn_accion.Text = "Accion.";
             btn_accion.UseVisualStyleBackColor = true;
             btn_accion.Click += btn_guardar_Click;
@@ -162,7 +162,7 @@
             label5.TabIndex = 11;
             label5.Text = "Id:";
             // 
-            // frm_Usuario_Nuevo
+            // frm_Usuario_ABM
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -180,7 +180,7 @@
             Controls.Add(label1);
             Controls.Add(txtb_nombre);
             Controls.Add(lbl_nombre);
-            Name = "frm_Usuario_Nuevo";
+            Name = "frm_Usuario_ABM";
             Text = "Usuario ABM.";
             Load += frm_Usuario_Nuevo_Load;
             ResumeLayout(false);
